@@ -27,7 +27,7 @@ jobs:
           java-version: "25"
 
       - name: Configurar Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Conceder permisos de ejecución a Gradle Wrapper
         run: chmod +x ./gradlew
