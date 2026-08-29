@@ -20,38 +20,26 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v4
 
-      # --- Si tu backend es Node.js, deja esto activo ---
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
+      - name: Configurar JDK 25
+        uses: actions/setup-java@v4
         with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
+          distribution: "temurin"
+          java-version: "25"
 
-      - name: Instalar dependencias (Node)
-        run: npm ci
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Linter (Node)
-        run: npm run lint --if-present
+      - name: Conceder permisos de ejecución a Gradle Wrapper
+        run: chmod +x ./gradlew
 
-      - name: Ejecutar pruebas (Node)
-        run: npm test --if-present
+      - name: Linter (verificación de estilo con Checkstyle)
+        run: ./gradlew checkstyleMain checkstyleTest --continue
 
-      # --- Si tu backend es Python, comenta el bloque de Node de arriba
-      #     y descomenta este bloque ---
-      # - name: Configurar Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: "3.12"
-      #
-      # - name: Instalar dependencias (Python)
-      #   run: pip install -r requirements.txt
-      #
-      # - name: Linter (Python)
-      #   run: pip install flake8 && flake8 .
-      #
-      # - name: Ejecutar pruebas (Python)
-      #   run: pytest
+      - name: Ejecutar pruebas (TDD)
+        run: ./gradlew test
+
+      - name: Build (empaquetar sin ejecutar pruebas de nuevo)
+        run: ./gradlew build -x test
 
   security-scan:
     runs-on: ubuntu-latest
